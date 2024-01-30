@@ -19,8 +19,8 @@ def main():
     random.shuffle(images)
 
     num_images = len(images)
-    num_train = int(num_images * 0.96)
-    num_val = int(num_images * 0.02)
+    num_train = int(num_images * 0.80)
+    num_val = int(num_images * 0.12)
 
     for i, img_before in enumerate(images):
         img_after = img_before.replace("_before.jpg", "_after.jpg")
