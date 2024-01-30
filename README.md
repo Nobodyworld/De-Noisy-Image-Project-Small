@@ -139,68 +139,100 @@ Number of trainable parameters: 5158995
 
 /model.py"
 No pre-trained model found. Training from scratch.
-Epoch [1/32], Loss: 0.4423, PSNR: 9.2922
-Validation Loss: 0.4056, PSNR: 9.9336
-Epoch [2/32], Loss: 0.3627, PSNR: 10.6420
-Validation Loss: 0.3549, PSNR: 10.8065
-Epoch [3/32], Loss: 0.3114, PSNR: 11.7114
-Validation Loss: 0.3065, PSNR: 11.7591
-Epoch [4/32], Loss: 0.2657, PSNR: 12.8736
-Validation Loss: 0.2396, PSNR: 13.6222
-Epoch [5/32], Loss: 0.2262, PSNR: 14.0401
-Validation Loss: 0.2355, PSNR: 13.8352
-Epoch [6/32], Loss: 0.1901, PSNR: 15.3750
-Validation Loss: 0.2652, PSNR: 13.7730
-Epoch [7/32], Loss: 0.1618, PSNR: 16.6132
-Validation Loss: 0.1581, PSNR: 16.7714
-Epoch [8/32], Loss: 0.1367, PSNR: 17.8996
-Validation Loss: 0.1240, PSNR: 18.7317
-Epoch [9/32], Loss: 0.1165, PSNR: 19.1519
-Validation Loss: 0.1109, PSNR: 19.6430
-Epoch [10/32], Loss: 0.1017, PSNR: 20.1655
-Validation Loss: 0.1003, PSNR: 20.4135
-Epoch [11/32], Loss: 0.0908, PSNR: 21.0079
-Validation Loss: 0.0894, PSNR: 20.7365
-Epoch [12/32], Loss: 0.0822, PSNR: 21.7378
-Validation Loss: 0.0776, PSNR: 22.5518
-Epoch [13/32], Loss: 0.0758, PSNR: 22.3025
-Validation Loss: 0.0747, PSNR: 22.7752
-Epoch [14/32], Loss: 0.0709, PSNR: 22.7352
-Validation Loss: 0.0700, PSNR: 23.1187
-Epoch [15/32], Loss: 0.0685, PSNR: 23.0095
-Validation Loss: 0.0610, PSNR: 23.7705
-Epoch [16/32], Loss: 0.0647, PSNR: 23.3626
-Validation Loss: 0.0593, PSNR: 24.3658
-Epoch [17/32], Loss: 0.0622, PSNR: 23.6591
-Validation Loss: 0.0586, PSNR: 24.3017
-Epoch [18/32], Loss: 0.0622, PSNR: 23.6446
-Validation Loss: 0.0538, PSNR: 24.8763
-Epoch [19/32], Loss: 0.0596, PSNR: 23.9008
-Validation Loss: 0.0531, PSNR: 24.9018
-Epoch [20/32], Loss: 0.0599, PSNR: 23.9102
-Validation Loss: 0.0560, PSNR: 24.9599
-Epoch [21/32], Loss: 0.0579, PSNR: 24.1470
-Validation Loss: 0.0652, PSNR: 23.6269
-Epoch [22/32], Loss: 0.0573, PSNR: 24.1552
-Validation Loss: 0.0511, PSNR: 25.0166
-Epoch [23/32], Loss: 0.0573, PSNR: 24.2055
-Validation Loss: 0.0507, PSNR: 25.2434
-Epoch [24/32], Loss: 0.0561, PSNR: 24.3089
-Validation Loss: 0.0524, PSNR: 25.0755
-Epoch [25/32], Loss: 0.0584, PSNR: 24.1095
-Validation Loss: 0.0537, PSNR: 24.7750
-Epoch [26/32], Loss: 0.0559, PSNR: 24.3107
-Validation Loss: 0.0493, PSNR: 25.4217
-Epoch [27/32], Loss: 0.0567, PSNR: 24.2692
-Validation Loss: 0.0526, PSNR: 25.4229
-Epoch [28/32], Loss: 0.0536, PSNR: 24.6227
-Validation Loss: 0.0528, PSNR: 25.2008
-Epoch [29/32], Loss: 0.0540, PSNR: 24.5950
-Validation Loss: 0.0492, PSNR: 25.5453
-Epoch [30/32], Loss: 0.0533, PSNR: 24.6575
-Validation Loss: 0.0568, PSNR: 24.3292
-Epoch [31/32], Loss: 0.0551, PSNR: 24.5233
-Validation Loss: 0.0532, PSNR: 25.0379
-Epoch [32/32], Loss: 0.0541, PSNR: 24.6063
-Validation Loss: 0.0541, PSNR: 25.2656
-Test Loss: 0.0580, PSNR: 24.9193
+Epoch [1/48], Loss: 0.4590, PSNR: 9.0256
+Validation Loss: 0.4111, PSNR: 9.7463
+Epoch [2/48], Loss: 0.3906, PSNR: 10.1210
+Validation Loss: 0.3656, PSNR: 10.5915
+Epoch [3/48], Loss: 0.3631, PSNR: 10.6348
+Validation Loss: 0.3496, PSNR: 10.9311
+Epoch [4/48], Loss: 0.3445, PSNR: 11.0200
+Validation Loss: 0.3428, PSNR: 11.0771
+Epoch [5/48], Loss: 0.3273, PSNR: 11.3700
+Validation Loss: 0.3229, PSNR: 11.5076
+Epoch [6/48], Loss: 0.3136, PSNR: 11.6636
+Validation Loss: 0.3014, PSNR: 11.9478
+Epoch [7/48], Loss: 0.2995, PSNR: 11.9669
+Validation Loss: 0.2823, PSNR: 12.3748
+Epoch [8/48], Loss: 0.2856, PSNR: 12.2870
+Validation Loss: 0.2868, PSNR: 12.3015
+Epoch [9/48], Loss: 0.2760, PSNR: 12.5328
+Validation Loss: 0.2594, PSNR: 12.9594
+Epoch [10/48], Loss: 0.2644, PSNR: 12.8281
+Validation Loss: 0.2585, PSNR: 13.0038
+Epoch [11/48], Loss: 0.2539, PSNR: 13.1152
+Validation Loss: 0.2548, PSNR: 13.1207
+Epoch [12/48], Loss: 0.2438, PSNR: 13.3911
+Validation Loss: 0.2331, PSNR: 13.7125
+Epoch [13/48], Loss: 0.2349, PSNR: 13.6553
+Validation Loss: 0.2268, PSNR: 13.9173
+Epoch [14/48], Loss: 0.2251, PSNR: 13.9547
+Validation Loss: 0.2127, PSNR: 14.3588
+Epoch [15/48], Loss: 0.2171, PSNR: 14.2186
+Validation Loss: 0.2056, PSNR: 14.6265
+Epoch [16/48], Loss: 0.2083, PSNR: 14.5040
+Validation Loss: 0.2001, PSNR: 14.7708
+Epoch [17/48], Loss: 0.1996, PSNR: 14.8151
+Validation Loss: 0.2000, PSNR: 14.8162
+Epoch [18/48], Loss: 0.1921, PSNR: 15.0934
+Validation Loss: 0.1840, PSNR: 15.3575
+Epoch [19/48], Loss: 0.1849, PSNR: 15.3527
+Validation Loss: 0.1888, PSNR: 15.1795
+Epoch [20/48], Loss: 0.1779, PSNR: 15.6158
+Validation Loss: 0.1744, PSNR: 15.8039
+Epoch [21/48], Loss: 0.1722, PSNR: 15.8854
+Validation Loss: 0.1675, PSNR: 16.1288
+Epoch [22/48], Loss: 0.1649, PSNR: 16.1948
+Validation Loss: 0.1599, PSNR: 16.4019
+Epoch [23/48], Loss: 0.1585, PSNR: 16.5062
+Validation Loss: 0.1549, PSNR: 16.7032
+Epoch [24/48], Loss: 0.1544, PSNR: 16.7112
+Validation Loss: 0.1499, PSNR: 17.0306
+Epoch [25/48], Loss: 0.1469, PSNR: 17.0932
+Validation Loss: 0.1374, PSNR: 17.5503
+Epoch [26/48], Loss: 0.1417, PSNR: 17.3295
+Validation Loss: 0.1383, PSNR: 17.5362
+Epoch [27/48], Loss: 0.1368, PSNR: 17.6108
+Validation Loss: 0.1281, PSNR: 18.0941
+Epoch [28/48], Loss: 0.1323, PSNR: 17.8748
+Validation Loss: 0.1219, PSNR: 18.4767
+Epoch [29/48], Loss: 0.1278, PSNR: 18.1278
+Validation Loss: 0.1273, PSNR: 18.2552
+Epoch [30/48], Loss: 0.1240, PSNR: 18.3380
+Validation Loss: 0.1200, PSNR: 18.6236
+Epoch [31/48], Loss: 0.1210, PSNR: 18.5212
+Validation Loss: 0.1208, PSNR: 18.5556
+Epoch [32/48], Loss: 0.1163, PSNR: 18.8424
+Validation Loss: 0.1123, PSNR: 19.1592
+Epoch [33/48], Loss: 0.1123, PSNR: 19.0597
+Validation Loss: 0.1119, PSNR: 19.1459
+Epoch [34/48], Loss: 0.1074, PSNR: 19.3705
+Validation Loss: 0.0977, PSNR: 20.0343
+Epoch [35/48], Loss: 0.1042, PSNR: 19.5855
+Validation Loss: 0.1026, PSNR: 19.7171
+Epoch [36/48], Loss: 0.1008, PSNR: 19.8480
+Validation Loss: 0.0978, PSNR: 20.1919
+Epoch [37/48], Loss: 0.0995, PSNR: 19.8962
+Validation Loss: 0.0949, PSNR: 20.2933
+Epoch [38/48], Loss: 0.0963, PSNR: 20.1377
+Validation Loss: 0.0900, PSNR: 20.6487
+Epoch [39/48], Loss: 0.0927, PSNR: 20.4455
+Validation Loss: 0.0891, PSNR: 20.8581
+Epoch [40/48], Loss: 0.0908, PSNR: 20.5816
+Validation Loss: 0.0875, PSNR: 20.9049
+Epoch [41/48], Loss: 0.0889, PSNR: 20.7054
+Validation Loss: 0.0820, PSNR: 21.2531
+Epoch [42/48], Loss: 0.0861, PSNR: 20.9458
+Validation Loss: 0.0850, PSNR: 21.2291
+Epoch [43/48], Loss: 0.0846, PSNR: 21.0837
+Validation Loss: 0.0804, PSNR: 21.5047
+Epoch [44/48], Loss: 0.0830, PSNR: 21.1821
+Validation Loss: 0.0805, PSNR: 21.6124
+Epoch [45/48], Loss: 0.0802, PSNR: 21.4567
+Validation Loss: 0.0785, PSNR: 21.7757
+Epoch [46/48], Loss: 0.0794, PSNR: 21.5219
+Validation Loss: 0.0734, PSNR: 22.1452
+Epoch [47/48], Loss: 0.0793, PSNR: 21.5721
+Validation Loss: 0.0736, PSNR: 22.1541
+Epoch [48/48], Loss: 0.0774, PSNR: 21.6938
+Validation Loss: 0.0686, PSNR: 22.5416
+Test Loss: 0.0716, PSNR: 22.2195

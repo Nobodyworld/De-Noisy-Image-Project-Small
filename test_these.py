@@ -4,8 +4,8 @@ import torchvision.transforms as transforms
 from PIL import Image
 from model import UNet
 
-img_height = 1152
-img_width = 768
+img_height = 960
+img_width = 640
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load the trained model
