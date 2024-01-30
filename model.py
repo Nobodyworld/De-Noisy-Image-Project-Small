@@ -8,7 +8,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import matplotlib.pyplot as plt
 import random
-
+import torch.nn.functional as F
 
 class UNet(nn.Module):
     def __init__(self):
@@ -110,7 +110,10 @@ class UNet(nn.Module):
         # Decoder
         x16 = self.dec_conv8(x15)
         x17 = self.up7(x16)
-        x18 = self.dec_conv7(torch.cat([x17, x13], dim=1))
+        print(x17.shape), print(x13.shape)
+        # Resize x13 to match x17's size
+        x13_resized = F.interpolate(x13, size=x17.shape[2:], mode='bilinear', align_corners=True)
+        x18 = self.dec_conv7(torch.cat([x17, x13_resized], dim=1))
         x19 = self.up6(x18)
         x20 = self.dec_conv6(torch.cat([x19, x11], dim=1))
         x21 = self.up5(x20)
