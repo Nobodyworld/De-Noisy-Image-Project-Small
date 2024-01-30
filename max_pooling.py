@@ -18,3 +18,4 @@ max_pooling_layers_height = max_pooling_layers(height)
 
 max_pooling_layers_width, max_pooling_layers_height
 
+print("Max pooling layers for width: ", max_pooling_layers_width)
