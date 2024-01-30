@@ -8,7 +8,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import matplotlib.pyplot as plt
 import random
-import torch.nn.functional as F
+
 
 class UNet(nn.Module):
     def __init__(self):
@@ -33,38 +33,22 @@ class UNet(nn.Module):
         self.pool6 = nn.MaxPool2d(2, 2)
         self.res_enc6 = nn.Sequential(nn.Conv2d(96, 96, 3, padding=1), nn.ReLU(inplace=True), nn.BatchNorm2d(96), nn.Conv2d(96, 96, 3, padding=1), nn.ReLU(inplace=True), nn.BatchNorm2d(96))
         self.enc_conv7 = nn.Sequential(nn.Conv2d(96, 112, 3, padding=1), nn.BatchNorm2d(112), nn.ReLU(inplace=True), nn.Conv2d(112, 112, 3, padding=1), nn.BatchNorm2d(112), nn.ReLU(inplace=True))
-        self.pool7 = nn.MaxPool2d(2, 2)
-        self.res_enc7 = nn.Sequential(nn.Conv2d(112, 112, 3, padding=1), nn.ReLU(inplace=True), nn.BatchNorm2d(112), nn.Conv2d(112, 112, 3, padding=1), nn.ReLU(inplace=True), nn.BatchNorm2d(112))
-        self.enc_conv8 = nn.Sequential(nn.Conv2d(112, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-
-        # Mid - I may have went a little crazy here. Feel free to simplify this and make sure to updated the forward function for Mid around line 100 if you do.
-        self.mid_conv1 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv2 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv3 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv4 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv5 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv6 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv7 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv8 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
-        self.mid_conv9 = nn.Sequential(nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True), nn.Conv2d(128, 128, 3, padding=1), nn.BatchNorm2d(128), nn.ReLU(inplace=True))
 
         # Decoder
-        self.dec_conv8 = nn.Sequential(nn.Conv2d(128, 112, 3, padding=1), nn.BatchNorm2d(112), nn.ReLU(inplace=True), nn.Conv2d(112, 112, 3, padding=1), nn.BatchNorm2d(112), nn.ReLU(inplace=True))
-        self.up7 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.dec_conv7 = nn.Sequential(nn.Conv2d(224, 96, 3, padding=1), nn.BatchNorm2d(96), nn.ReLU(inplace=True), nn.Conv2d(96, 96, 3, padding=1), nn.BatchNorm2d(96), nn.ReLU(inplace=True))
+        self.dec_conv7 = nn.Sequential(nn.Conv2d(112, 96, 3, padding=1), nn.BatchNorm2d(96), nn.ReLU(inplace=True), nn.Conv2d(96, 96, 3, padding=1), nn.BatchNorm2d(96), nn.ReLU(inplace=True))
         self.up6 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.dec_conv6 = nn.Sequential(nn.Conv2d(192, 80, 3, padding=1), nn.BatchNorm2d(80), nn.ReLU(inplace=True), nn.Conv2d(80, 80, 3, padding=1), nn.BatchNorm2d(80), nn.ReLU(inplace=True))
+        self.dec_conv6 = nn.Sequential(nn.Conv2d(96, 80, 3, padding=1), nn.BatchNorm2d(80), nn.ReLU(inplace=True), nn.Conv2d(80, 80, 3, padding=1), nn.BatchNorm2d(80), nn.ReLU(inplace=True))
         self.up5 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.dec_conv5 = nn.Sequential(nn.Conv2d(160, 64, 3, padding=1), nn.BatchNorm2d(64), nn.ReLU(inplace=True), nn.Conv2d(64, 64, 3, padding=1), nn.BatchNorm2d(64), nn.ReLU(inplace=True))
+        self.dec_conv5 = nn.Sequential(nn.Conv2d(80, 64, 3, padding=1), nn.BatchNorm2d(64), nn.ReLU(inplace=True), nn.Conv2d(64, 64, 3, padding=1), nn.BatchNorm2d(64), nn.ReLU(inplace=True))
         self.up4 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.dec_conv4 = nn.Sequential(nn.Conv2d(128, 48, 3, padding=1), nn.BatchNorm2d(48), nn.ReLU(inplace=True), nn.Conv2d(48, 48, 3, padding=1), nn.BatchNorm2d(48), nn.ReLU(inplace=True))
+        self.dec_conv4 = nn.Sequential(nn.Conv2d(64, 48, 3, padding=1), nn.BatchNorm2d(48), nn.ReLU(inplace=True), nn.Conv2d(48, 48, 3, padding=1), nn.BatchNorm2d(48), nn.ReLU(inplace=True))
         self.up3 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.dec_conv3 = nn.Sequential(nn.Conv2d(96, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True), nn.Conv2d(32, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True))
+        self.dec_conv3 = nn.Sequential(nn.Conv2d(48, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True), nn.Conv2d(32, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True))
         self.up2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.dec_conv2 = nn.Sequential(nn.Conv2d(64, 16, 3, padding=1), nn.BatchNorm2d(16), nn.ReLU(inplace=True), nn.Conv2d(16, 16, 3, padding=1), nn.BatchNorm2d(16), nn.ReLU(inplace=True))
+        self.dec_conv2 = nn.Sequential(nn.Conv2d(32, 16, 3, padding=1), nn.BatchNorm2d(16), nn.ReLU(inplace=True), nn.Conv2d(16, 16, 3, padding=1), nn.BatchNorm2d(16), nn.ReLU(inplace=True))
         self.up1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         # Modify the last decoder layer to have 32 output channels
-        self.dec_conv1 = nn.Sequential(nn.Conv2d(32, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True), nn.Conv2d(32, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True))
+        self.dec_conv1 = nn.Sequential(nn.Conv2d(16, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True), nn.Conv2d(32, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(inplace=True))
 
         # Keep the output layer's input channels at 32
         self.out_conv = nn.Sequential(
@@ -93,44 +77,35 @@ class UNet(nn.Module):
         x12 = self.pool6(x11)
         x12 = x12 + self.res_enc6(x12)
         x13 = self.enc_conv7(x12)
-        x14 = self.pool7(x13)
-        x15 = self.enc_conv8(x14)
-
-        # Mid
-        x15 = self.mid_conv1(x15)
-        x15 = self.mid_conv2(x15)
-        x15 = self.mid_conv3(x15)
-        x15 = self.mid_conv4(x15)
-        x15 = self.mid_conv5(x15)
-        x15 = self.mid_conv6(x15)
-        x15 = self.mid_conv7(x15)
-        x15 = self.mid_conv8(x15)
-        x15 = self.mid_conv9(x15)
 
         # Decoder
-        x16 = self.dec_conv8(x15)
-        x17 = self.up7(x16)
-        print(x17.shape), print(x13.shape)
-        # Resize x13 to match x17's size
-        x13_resized = F.interpolate(x13, size=x17.shape[2:], mode='bilinear', align_corners=True)
-        x18 = self.dec_conv7(torch.cat([x17, x13_resized], dim=1))
-        x19 = self.up6(x18)
-        x20 = self.dec_conv6(torch.cat([x19, x11], dim=1))
-        x21 = self.up5(x20)
-        x22 = self.dec_conv5(torch.cat([x21, x9], dim=1))
-        x23 = self.up4(x22)
-        x24 = self.dec_conv4(torch.cat([x23, x7], dim=1))
-        x25 = self.up3(x24)
-        x26 = self.dec_conv3(torch.cat([x25, x5], dim=1))
-        x27 = self.up2(x26)
-        x28 = self.dec_conv2(torch.cat([x27, x3], dim=1))
-        x29 = self.up1(x28)
-        x30 = self.dec_conv1(torch.cat([x29, x1], dim=1))
+        x14 = self.dec_conv7(x13)
+        x14 = x14 + x12
+        x15 = self.up6(x14)
+        x16 = self.dec_conv6(x15)
+        x16 = x16 + x10
+        x17 = self.up5(x16)
+        x18 = self.dec_conv5(x17)
+        x18 = x18 + x8
+        x19 = self.up4(x18)
+        x20 = self.dec_conv4(x19)
+        x20 = x20 + x6
+        x21 = self.up3(x20)
+        x22 = self.dec_conv3(x21)
+        x22 = x22 + x4
+        x23 = self.up2(x22)
+        x24 = self.dec_conv2(x23)
+        x24 = x24 + x2
+        x25 = self.up1(x24)
+        x26 = self.dec_conv1(x25)
 
-        # Output
-        x31 = self.out_conv(x30)
-        return x31
-        
+        # Output layer
+        x27 = self.out_conv(x26)
+
+        return x27
+    
+
+
 class DenoisingDataset(Dataset):
     def __init__(self, noisy_dir, clean_dir, noisy_transform=None, clean_transform=None):
         self.noisy_dir = noisy_dir
@@ -195,10 +170,10 @@ def main():
     torch.manual_seed(42)
 
     # Set batch size, image dimensions
-    batch_size = 32
+    batch_size = 6
     img_height = 960
     img_width = 640
-    epochs = 32
+    epochs = 48
 
     # Define the device
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
