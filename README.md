@@ -18,16 +18,6 @@ For image dimensions of 640 in width and 960 in height, you can apply a maximum 
 
 "ceil_mode plici(bool) – when True, will use ceil instead of floor to compute the output shape." https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html#torch.nn.MaxPool2d
 
-Table Explanation:
-count	width	height
-0    	640    960
-1    	320    480
-2    	160	   240
-3  	  80	   120
-4    	40	   60
-2	    20	   30
-6    	10	   15
-7	    5  	   7.5
 ![image](https://github.com/Nobodyworld/De-Noisy-Image-Project-Small/assets/127373451/ae4f539f-41d8-4ecf-9d2a-f82dfb5b0682)
 
 Tensor mismatch
