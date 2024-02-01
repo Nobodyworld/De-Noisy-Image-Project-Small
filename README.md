@@ -1,6 +1,6 @@
 # De-Noisy-Image-Project Small
 
-This repository contains scripts and directories for an image the 'De-Noisy Image Project' using a U-Net architecture. The main components are the `resized_imgs` folder for storing and preprocessing images before training, `test_these` for extra inference, and the `model.py` script for training and architecture. The `model.py` will run without an NVIDIA GPU but you should consider reducing the image sizes, the number of layers, or these varaibles below from near lines 190-200 of `model.py`.
+This repository contains scripts and directories for the 'De-Noisy Image Project' using a U-Net architecture. The main components are the `resized_imgs` folder for storing and preprocessing images before training, `test_these` for extra inference, and the `model.py` script for training and architecture. The `model.py` will run without an NVIDIA GPU but you should consider reducing the image sizes, the number of layers, or these varaibles below from near lines 190-200 of `model.py`.
 
 For image dimensions of 640 in width and 960 in height, you can apply a maximum of 9 pooling layers. This number is calculated based on how many times each dimension can be divided by 2 (halved) until it reaches a minimum size, typically at least 1 pixel. Both the width and height in your case support up to 9 such divisions.
 
