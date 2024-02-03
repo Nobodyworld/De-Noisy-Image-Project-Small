@@ -1,0 +1,28 @@
+{
+    "directories": {
+      "train": "./train",
+      "test": "./test",
+      "validation": "./val",
+      "test_these": "./test_these",
+      "resized_images": "./resized_imgs",
+      "output": "./test_these/output"
+    },
+    "paths": {
+      "model": {
+        "save_path": "best_psnr_denocoder_pytorch.pth"
+      }
+    },
+    "data_folders": {
+      "train_clean": "train/clean",
+      "train_noisy": "train/noisy",
+      "val_clean": "val/clean",
+      "val_noisy": "val/noisy",
+      "test_clean": "test/clean",
+      "test_noisy": "test/noisy"
+    },
+    "rename": {
+      "new_basename": "_"
+    },
+    "source_folder": "resized_imgs"
+  }
+  
