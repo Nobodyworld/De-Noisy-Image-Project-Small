@@ -1,7 +1,7 @@
 import os
 
 # Define data directory
-input_dir = 'test_these\output'
+input_dir = 'retest_these\output'
 
 # Rename each image with '_before' in its filename
 for filename in os.listdir(input_dir):
