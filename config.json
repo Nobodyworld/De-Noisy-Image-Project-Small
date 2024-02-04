@@ -1,25 +1,34 @@
 {
-    "directories": {
+  "directories": {
+    "data": {
       "train": "./train",
       "test": "./test",
-      "validation": "./val",
-      "retest_these": "./retest_these",
-      "resized_images": "./resized_imgs",
-      "output": "./retest_these/output"
+      "val": "./val",
+      "resized_imgs": "./resized_imgs",
+      "retest_these": "retest_these",
+      "test_these": "./test_these"
     },
-    "paths": {
-      "model": {
-        "save_path": "./models/best_psnr_denocoder_pytorch.pth"
-      }
+    "model": {
+      "model_path": "best_psnr_denocoder_pytorch.pth"
+    }
+  },
+  "data_paths": {
+    "train": {
+      "clean": "train/clean",
+      "noisy": "train/noisy"
     },
-    "data_folders": {
-      "train_clean": "train/clean",
-      "train_noisy": "train/noisy",
-      "val_clean": "val/clean",
-      "val_noisy": "val/noisy",
-      "test_clean": "test/clean",
-      "test_noisy": "test/noisy"
+    "val": {
+      "clean": "val/clean",
+      "noisy": "val/noisy"
     },
-    "source_folder": "resized_imgs"
+    "test": {
+      "clean": "test/clean",
+      "noisy": "test/noisy"
+    }
+  },
+  "staging": {
+    "src_folder": "resized_imgs",
+    "dest_folder": "resized_imgs",
+    "input_dir": "./resized_imgs"
   }
-  
+}

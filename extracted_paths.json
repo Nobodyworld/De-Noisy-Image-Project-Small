@@ -1,0 +1,106 @@
+{
+    "model.py": [
+        {
+            "train_dir": "./train"
+        },
+        {
+            "test_dir": "./test"
+        },
+        {
+            "val_dir": "./val"
+        },
+        {
+            "model_path": "best_psnr_denocoder_pytorch.pth"
+        }
+    ],
+    "train.py": [
+        {
+            "train_dir": "./train"
+        },
+        {
+            "test_dir": "./test"
+        },
+        {
+            "val_dir": "./val"
+        },
+        {
+            "model_path": "best_psnr_denocoder_pytorch.pth"
+        }
+    ],
+    "stagegetimgs.py": [
+        {
+            "dest_folder": "resized_imgs"
+        },
+        {
+            "train_clean": "train/clean"
+        },
+        {
+            "train_noisy": "train/noisy"
+        },
+        {
+            "val_clean": "val/clean"
+        },
+        {
+            "val_noisy": "val/noisy"
+        },
+        {
+            "test_clean": "test/clean"
+        },
+        {
+            "test_noisy": "test/noisy"
+        }
+    ],
+    "stagemoveimgs.py": [
+        {
+            "src_folder": "resized_imgs"
+        },
+        {
+            "train_clean": "train/clean"
+        },
+        {
+            "train_noisy": "train/noisy"
+        },
+        {
+            "val_clean": "val/clean"
+        },
+        {
+            "val_noisy": "val/noisy"
+        },
+        {
+            "test_clean": "test/clean"
+        },
+        {
+            "test_noisy": "test/noisy"
+        }
+    ],
+    "stagename.py": [
+        {
+            "new_basename": "_"
+        }
+    ],
+    "stagerename.py": [
+        {
+            "input_dir": "./resized_imgs"
+        }
+    ],
+    "stagerename_test_before.py": [
+        {
+            "input_dir": "retest_these"
+        }
+    ],
+    "stageresize.py": [
+        {
+            "input_dir": ".\\test_these"
+        }
+    ],
+    "stageresizeimgs.py": [
+        {
+            "input_dir": "./resized_imgs"
+        }
+    ],
+    "atest_img_size.py": [
+        {
+            "directory": "./train"
+        }
+    ]
+}
