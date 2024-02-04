@@ -3,13 +3,13 @@
       "train": "./train",
       "test": "./test",
       "validation": "./val",
-      "test_these": "./test_these",
+      "retest_these": "./retest_these",
       "resized_images": "./resized_imgs",
-      "output": "./test_these/output"
+      "output": "./retest_these/output"
     },
     "paths": {
       "model": {
-        "save_path": "best_psnr_denocoder_pytorch.pth"
+        "save_path": "./models/best_psnr_denocoder_pytorch.pth"
       }
     },
     "data_folders": {

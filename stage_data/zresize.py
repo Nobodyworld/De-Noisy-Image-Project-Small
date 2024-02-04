@@ -2,8 +2,8 @@ import os
 from PIL import Image
 
 # Set image dimensions
-img_height = 1920
-img_width = 1280
+img_height = 960
+img_width = 640
 
 # Define data directory
 input_dir = '.\test_these'

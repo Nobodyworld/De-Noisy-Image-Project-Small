@@ -19,13 +19,13 @@ Ensure that all images are initially placed in the `resized_imgs` directory. The
 Run this script to resize all images in the `resized_imgs` folder. This is an essential step to standardize image sizes across your dataset, and will throw an error if you during training if you have an image in which the aspect ratio is mismatched with the array being used for matrix multiplication. 
 
 Simple Example: If we have a 2:3 and a 3:4 image, in terms of aspect ratio the dot products would mismatch as follows.....
-...
-2x3:               3x4:
-x-x-Error          x-x-x
-x-x-Error          x-x-x
-x-x-Error          x-x-x
-Error-Error-Error  x-x-x
-...
+    """
+      2x3:               3x4:
+      x-x-Error          x-x-x
+      x-x-Error          x-x-x
+      x-x-Error          x-x-x
+      Error-Error-Error  x-x-x
+    """
 Note: Though this a simple example, a nugget to take away from this is that if we have the same aspect ratio across two different images we can normalize before the training step of 'model.py' or maintain consideration as to the intrinsic meaning of what we could accomplish with different size images and relative aspect ratios. (I have not been creative or logical enough to come up with a significant use case, but I am sure a very powerful one exists.)
 
 ### Using `zmove.py`

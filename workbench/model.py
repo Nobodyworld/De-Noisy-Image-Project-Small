@@ -104,8 +104,6 @@ class UNet(nn.Module):
 
         return x27
     
-
-
 class DenoisingDataset(Dataset):
     def __init__(self, noisy_dir, clean_dir, noisy_transform=None, clean_transform=None):
         self.noisy_dir = noisy_dir

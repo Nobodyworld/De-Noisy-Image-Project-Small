@@ -1,7 +1,7 @@
 import os
 
 # Define data directory 
-input_dir = 'test_these'
+input_dir = 'retest_these'
 
 # Initialize counter variable
 count = 1
