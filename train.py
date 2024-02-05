@@ -1,26 +1,50 @@
-from model_parts.unet import UNet
-from data_parts.denoising_dataset import DenoisingDataset
-from config_loader import load_config
-import matplotlib.pyplot as plt
-import torch.nn as nn
-from utils.metrics import psnr
-from torch.utils.data import DataLoader
-from torchvision import transforms
-import torch
+import json
 import os
+import torch
+import torch.nn as nn
+from torchvision import transforms
+from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
+from model_parts.unet import UNet
+from data_parts.pairedimage_dataset import PairedImageDataset
+from utils.metrics import psnr
+
+# Load configuration from config.json
+try:
+    with open('config.json', 'r') as config_file:
+        config = json.load(config_file)
+except FileNotFoundError:
+    print("Error: config.json file not found.")
+    exit(1)
+except json.JSONDecodeError:
+    print("Error: Failed to decode config.json.")
+    exit(1)
 
 # Accessing data directories and model path from the config
-config = load_config()
 train_dir = os.path.join(config['directories']['data']['train'])
 test_dir = os.path.join(config['directories']['data']['test'])
 val_dir = os.path.join(config['directories']['data']['val'])
-model_path = os.path.join(config['directories']['model']['model_path'])
+model_save_path = os.path.join(config['directories']['model']['model_path']) # Updated for saving models
 
-# Accessing specific data paths
-train_clean_path = os.path.join(config['data_paths']['train']['clean'])
-train_noisy_path = os.path.join(config['data_paths']['train']['noisy'])
-# Similar approach for val and test paths if needed
+def main():
+    # (Your initialization and setup code here...)
+    
+    model = UNet().to(device)
+    model_path = os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth') # Use model_save_path for loading
+    if os.path.exists(model_path):
+        model.load_state_dict(torch.load(model_path))
+        print("Pre-trained model loaded.")
+    else:
+        print("No pre-trained model found. Training from scratch.")
+    
+    # (Training, evaluation, and saving model code here...)
 
+    # When saving models, use the model_save_path
+    torch.save(best_loss_model_state, os.path.join(model_save_path, 'best_loss_denocoder_pytorch.pth'))
+    torch.save(best_psnr_model_state, os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth'))
+
+if __name__ == "__main__":
+    main()
 
 def main():
     # Set seed for reproducibility
@@ -40,22 +64,23 @@ def main():
     test_dir = './data/test'
     val_dir = './data/val'
 
-    noisy_transform = transforms.Compose([
-        transforms.Resize((img_height, img_width), antialias=None),            
-        #RandomColorJitterWithRandomFactors(p=0.25),
-        transforms.ToTensor(), 
-        # Add any other noisy-specific transformationss
-    ])
-
-    clean_transform = transforms.Compose([
-        transforms.Resize((img_height, img_width), antialias=None),
+    # Transformation for before (before) images
+    before_transform = transforms.Compose([
+        transforms.Resize((img_height, img_width)),
         transforms.ToTensor(),
-        # Add any other clean-specific transformations
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-    train_dataset = DenoisingDataset(os.path.join(train_dir, 'noisy'), os.path.join(train_dir, 'clean'), noisy_transform=noisy_transform, clean_transform=clean_transform)
-    val_dataset = DenoisingDataset(os.path.join(val_dir, 'noisy'), os.path.join(val_dir, 'clean'), noisy_transform=noisy_transform, clean_transform=clean_transform)
-    test_dataset = DenoisingDataset(os.path.join(test_dir, 'noisy'), os.path.join(test_dir, 'clean'), noisy_transform=noisy_transform, clean_transform=clean_transform)
+    # Transformation for after (after) images
+    after_transform = transforms.Compose([
+        transforms.Resize((img_height, img_width)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    train_dataset = PairedImageDataset(train_dir, before_transform=before_transform, after_transform=after_transform)
+    val_dataset = PairedImageDataset(val_dir, before_transform=before_transform, after_transform=after_transform)
+    test_dataset = PairedImageDataset(test_dir, before_transform=before_transform, after_transform=after_transform)
 
     # Load data
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=4)
@@ -97,12 +122,12 @@ def main():
         model.train()
         running_loss = 0.0
         running_psnr = 0.0
-        for i, (noisy_imgs, clean_imgs) in enumerate(train_loader):
-            noisy_imgs, clean_imgs = noisy_imgs.to(device), clean_imgs.to(device)
+        for i, (before_imgs, after_imgs) in enumerate(train_loader):
+            before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)
             optimizer.zero_grad()
-            outputs = model(noisy_imgs)
-            l1_loss = l1_criterion(outputs, clean_imgs)
-            mse_loss = mse_criterion(outputs, clean_imgs)
+            outputs = model(before_imgs)
+            l1_loss = l1_criterion(outputs, after_imgs)
+            mse_loss = mse_criterion(outputs, after_imgs)
             loss = l1_loss + mse_loss
             loss /= accumulation_steps
             loss.backward()
@@ -111,7 +136,7 @@ def main():
 
             # Update running_loss and running_psnr for every mini-batch
             running_loss += loss.item() * accumulation_steps
-            psnr_val = psnr(outputs.detach().cpu(), clean_imgs.cpu())
+            psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())
             running_psnr += psnr_val
 
         if (i + 1) % accumulation_steps != 0 or i == len(train_loader) - 1:
@@ -130,15 +155,15 @@ def main():
         running_psnr = 0.0
 
         with torch.no_grad():
-            for i, (noisy_imgs, clean_imgs) in enumerate(val_loader):
-                noisy_imgs, clean_imgs = noisy_imgs.to(device), clean_imgs.to(device)
+            for i, (before_imgs, after_imgs) in enumerate(val_loader):
+                before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)
 
-                outputs = model(noisy_imgs)
-                l1_loss = l1_criterion(outputs, clean_imgs)
-                mse_loss = mse_criterion(outputs, clean_imgs)
+                outputs = model(before_imgs)
+                l1_loss = l1_criterion(outputs, after_imgs)
+                mse_loss = mse_criterion(outputs, after_imgs)
                 loss = l1_loss + mse_loss  # Combine L1 and L2 loss
                 val_running_loss += loss.item()
-                psnr_val = psnr(outputs.detach().cpu(), clean_imgs.cpu())
+                psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())
                 running_psnr += psnr_val
 
         val_losses.append(val_running_loss / len(val_loader))
@@ -175,14 +200,14 @@ def main():
     test_running_loss = 0.0
     test_running_psnr = 0.0
     with torch.no_grad():
-        for i, (noisy_imgs, clean_imgs) in enumerate(test_loader):
-            noisy_imgs, clean_imgs = noisy_imgs.to(device), clean_imgs.to(device)
-            outputs = model(noisy_imgs)
-            l1_loss = l1_criterion(outputs, clean_imgs)
-            mse_loss = mse_criterion(outputs, clean_imgs)
+        for i, (before_imgs, after_imgs) in enumerate(test_loader):
+            before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)
+            outputs = model(before_imgs)
+            l1_loss = l1_criterion(outputs, after_imgs)
+            mse_loss = mse_criterion(outputs, after_imgs)
             loss = l1_loss + mse_loss  # Combine L1 and L2 loss
             test_running_loss += loss.item()
-            psnr_val = psnr(outputs.detach().cpu(), clean_imgs.cpu())
+            psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())
             test_running_psnr += psnr_val
             
     print("Test Loss: {:.4f}, PSNR: {:.4f}".format(test_running_loss / len(test_loader), test_running_psnr / len(test_loader)))

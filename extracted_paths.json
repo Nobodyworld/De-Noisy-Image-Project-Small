@@ -1,27 +1,13 @@
 {
-    "model.py": [
-        {
-            "train_dir": "./train"
-        },
-        {
-            "test_dir": "./test"
-        },
-        {
-            "val_dir": "./val"
-        },
-        {
-            "model_path": "best_psnr_denocoder_pytorch.pth"
-        }
-    ],
     "train.py": [
         {
-            "train_dir": "./train"
+            "train_dir": "./data/train"
         },
         {
-            "test_dir": "./test"
+            "test_dir": "./data/test"
         },
         {
-            "val_dir": "./val"
+            "val_dir": "./data/val"
         },
         {
             "model_path": "best_psnr_denocoder_pytorch.pth"
