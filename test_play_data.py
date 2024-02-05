@@ -3,7 +3,7 @@ import os
 import torch
 import torchvision.transforms as transforms
 from PIL import Image
-from model_parts import UNet
+from models.unet import UNet
 
 # Load configuration from config.json
 try:

@@ -1,4 +1,3 @@
-# model_parts/unet.py
 import torch.nn as nn
 
 class UNet(nn.Module):

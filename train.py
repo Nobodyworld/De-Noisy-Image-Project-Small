@@ -5,8 +5,8 @@ import torch.nn as nn
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from model_parts.unet import UNet
-from data_parts.pairedimage_dataset import PairedImageDataset
+from models.unet import UNet
+from utils.pairedimage_dataset import PairedImageDataset
 from utils.metrics import psnr
 
 # Load configuration from config.json
@@ -27,26 +27,6 @@ val_dir = os.path.join(config['directories']['data']['val'])
 model_save_path = os.path.join(config['directories']['model']['model_path']) # Updated for saving models
 
 def main():
-    # (Your initialization and setup code here...)
-    
-    model = UNet().to(device)
-    model_path = os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth') # Use model_save_path for loading
-    if os.path.exists(model_path):
-        model.load_state_dict(torch.load(model_path))
-        print("Pre-trained model loaded.")
-    else:
-        print("No pre-trained model found. Training from scratch.")
-    
-    # (Training, evaluation, and saving model code here...)
-
-    # When saving models, use the model_save_path
-    torch.save(best_loss_model_state, os.path.join(model_save_path, 'best_loss_denocoder_pytorch.pth'))
-    torch.save(best_psnr_model_state, os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth'))
-
-if __name__ == "__main__":
-    main()
-
-def main():
     # Set seed for reproducibility
     torch.manual_seed(42)
 
@@ -58,11 +38,6 @@ def main():
 
     # Define the device
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-    # Define data directories
-    train_dir = './data/train'
-    test_dir = './data/test'
-    val_dir = './data/val'
 
     # Transformation for before (before) images
     before_transform = transforms.Compose([
@@ -87,8 +62,9 @@ def main():
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=4)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=4)
 
+    # Initialize the model
     model = UNet().to(device)
-    model_path = 'best_psnr_denocoder_pytorch.pth'
+    model_path = os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth') # Use model_save_path for loading
     if os.path.exists(model_path):
         model.load_state_dict(torch.load(model_path))
         print("Pre-trained model loaded.")
@@ -219,9 +195,9 @@ def main():
     plt.legend()
     plt.show()
 
-    # Save the trained model and the best model to files
-    torch.save(best_loss_model_state, 'best_loss_denocoder_pytorch.pth')
-    torch.save(best_psnr_model_state, 'best_psnr_denocoder_pytorch.pth')
+    # When saving models, use the model_save_path
+    torch.save(best_loss_model_state, os.path.join(model_save_path, 'best_loss_denocoder_pytorch.pth'))
+    torch.save(best_psnr_model_state, os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth'))
 
 if __name__ == "__main__":
     main()

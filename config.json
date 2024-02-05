@@ -1,20 +1,16 @@
 {
+  "project_root": ".",
   "directories": {
     "data": {
       "train": "./data/train",
       "test": "./data/test",
       "val": "./data/val",
       "play_data": "./data/play_data",
+      "play_data_output": "./data/play_data/output",
       "stage_data": "./data/stage_data"
     },
-    "model": {
-      "model_path": "./models/"
-    }
-  },
-  
-  "staging": {
-    "src_folder": "resized_imgs",
-    "dest_folder": "resized_imgs",
-    "input_dir": "./resized_imgs"
+    "helpers": "./helpers",
+    "models": "./models",
+    "utils": "./utils"
   }
 }
