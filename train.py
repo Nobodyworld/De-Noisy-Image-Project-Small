@@ -1,3 +1,4 @@
+# train.py trains the UNet model on the paired image dataset and saves the best model based on validation loss and PSNR. /utils contians metrics.py, pairedimage_dataset.py, and transforms.py
 import json
 import os
 import torch
@@ -22,16 +23,22 @@ except json.JSONDecodeError:
 
 # Accessing data directories and model path from the config
 train_dir = os.path.join(config['directories']['data']['train'])
+print(train_dir)
 test_dir = os.path.join(config['directories']['data']['test'])
+print(test_dir)
 val_dir = os.path.join(config['directories']['data']['val'])
-model_save_path = os.path.join(config['directories']['model']['model_path']) # Updated for saving models
+print(val_dir)
+model_psnr = (config['directories']['models']['model_psnr'])
+print(model_psnr)
+model_loss = (config['directories']['models']['model_loss'])
+print(model_loss)
 
 def main():
     # Set seed for reproducibility
     torch.manual_seed(42)
 
     # Set batch size, image dimensions
-    batch_size = 6
+    batch_size = 12
     img_height = 960
     img_width = 640
     epochs = 48
@@ -42,15 +49,13 @@ def main():
     # Transformation for before (before) images
     before_transform = transforms.Compose([
         transforms.Resize((img_height, img_width)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transforms.ToTensor()
     ])
 
     # Transformation for after (after) images
     after_transform = transforms.Compose([
         transforms.Resize((img_height, img_width)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transforms.ToTensor()
     ])
 
     train_dataset = PairedImageDataset(train_dir, before_transform=before_transform, after_transform=after_transform)
@@ -64,9 +69,9 @@ def main():
 
     # Initialize the model
     model = UNet().to(device)
-    model_path = os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth') # Use model_save_path for loading
-    if os.path.exists(model_path):
-        model.load_state_dict(torch.load(model_path))
+    
+    if os.path.exists(model_loss):
+        model.load_state_dict(torch.load(model_loss))
         print("Pre-trained model loaded.")
     else:
         print("No pre-trained model found. Training from scratch.")
@@ -149,24 +154,24 @@ def main():
         # Update the scheduler after each epoch
         scheduler.step(running_psnr / len(val_loader))
 
-        # Update best validation PSNR and reset patience counter
+        # Update best validation PSNR and loss, reset patience counter
         if val_running_loss / len(val_loader) < best_val_loss:
             best_val_loss = val_running_loss / len(val_loader)
             best_loss_model_state = model.state_dict()
-            epochs_since_best_val_loss = 0
+            epochs_since_best_val_loss = 0  # Reset for best loss
         else:
-            epochs_since_best_val_loss += 1
+            epochs_since_best_val_loss += 1  # Increment if no improvement in loss
 
         if running_psnr / len(val_loader) > best_val_psnr:
             best_val_psnr = running_psnr / len(val_loader)
             best_psnr_model_state = model.state_dict()
-            epochs_since_best_val_psnr = 0
+            epochs_since_best_val_psnr = 0  # Reset for best PSNR
         else:
-            epochs_since_best_val_psnr += 1
+            epochs_since_best_val_psnr += 1  # Increment if no improvement in PSNR
+
         if epochs_since_best_val_loss >= early_stopping_patience and epochs_since_best_val_psnr >= early_stopping_patience:
             print("Early stopping triggered. Stopping training.")
             break
-
 
     # Load the best model state for testing
     model.load_state_dict(best_loss_model_state)
@@ -196,8 +201,8 @@ def main():
     plt.show()
 
     # When saving models, use the model_save_path
-    torch.save(best_loss_model_state, os.path.join(model_save_path, 'best_loss_denocoder_pytorch.pth'))
-    torch.save(best_psnr_model_state, os.path.join(model_save_path, 'best_psnr_denocoder_pytorch.pth'))
+    torch.save(best_loss_model_state, (model_loss))
+    torch.save(best_psnr_model_state, (model_psnr))
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,4 @@
-# Description: Custom transforms for data augmentation
+# /utils/transforms.py
 import random
 import torchvision
 
@@ -23,3 +23,4 @@ class RandomColorJitterWithRandomFactors(torchvision.transforms.ColorJitter):
             return jitter(img)
         else:
             return img
+        
