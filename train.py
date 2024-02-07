@@ -23,16 +23,10 @@ except json.JSONDecodeError:
 
 # Accessing data directories and model path from the config
 train_dir = os.path.join(config['directories']['data']['train'])
-print(train_dir)
 test_dir = os.path.join(config['directories']['data']['test'])
-print(test_dir)
 val_dir = os.path.join(config['directories']['data']['val'])
-print(val_dir)
 model_psnr = (config['directories']['models']['model_psnr'])
-print(model_psnr)
 model_loss = (config['directories']['models']['model_loss'])
-print(model_loss)
-
 
 def main():
     # Set seed for reproducibility
@@ -194,16 +188,16 @@ def main():
             
     print("Test Loss: {:.4f}, PSNR: {:.4f}".format(test_running_loss / len(test_loader), test_running_psnr / len(test_loader)))
 
+    # When saving models, use the model_save_path
+    torch.save(best_loss_model_state, (model_loss))
+    torch.save(best_psnr_model_state, (model_psnr))
+
     plt.plot(train_losses, label="Training Loss")
     plt.plot(val_losses, label="Validation Loss")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend()
     plt.show()
-
-    # When saving models, use the model_save_path
-    torch.save(best_loss_model_state, (model_loss))
-    torch.save(best_psnr_model_state, (model_psnr))
 
 if __name__ == "__main__":
     main()
