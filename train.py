@@ -1,4 +1,4 @@
-# train.py trains the UNet model on the paired image dataset and saves the best model based on validation loss and PSNR. /utils contians metrics.py, pairedimage_dataset.py, and transforms.py
+# train.py
 import json
 import os
 import torch
@@ -6,7 +6,7 @@ import torch.nn as nn
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from models.unet import UNet
+from utils.unet import UNet
 from utils.pairedimage_dataset import PairedImageDataset
 from utils.metrics import psnr
 
@@ -25,8 +25,6 @@ except json.JSONDecodeError:
 train_dir = os.path.join(config['directories']['data']['train'])
 test_dir = os.path.join(config['directories']['data']['test'])
 val_dir = os.path.join(config['directories']['data']['val'])
-model_psnr = (config['directories']['models']['model_psnr'])
-model_loss = (config['directories']['models']['model_loss'])
 
 def main():
     # Set seed for reproducibility
@@ -64,140 +62,145 @@ def main():
 
     # Initialize the model
     model = UNet().to(device)
-    
-    if os.path.exists(model_loss):
-        model.load_state_dict(torch.load(model_loss))
+    model_path = 'best_psnr_denocoder_pytorch.pth'
+    if os.path.exists(model_path):
+        model.load_state_dict(torch.load(model_path))
         print("Pre-trained model loaded.")
     else:
         print("No pre-trained model found. Training from scratch.")
 
-    # Initialize the model, loss, and optimizer
-    l1_criterion = nn.L1Loss()
-    mse_criterion = nn.MSELoss()
+        
+    # Initialize loss functions, optimizer, learning rate scheduler, and variables for tracking best performance metrics.
+    l1_criterion = nn.L1Loss()  # L1 loss (mean absolute error) for penalizing the absolute difference between target and predicted images.
+    mse_criterion = nn.MSELoss()  # Mean squared error loss for penalizing the squared difference between target and predicted images.
+    # Initialize the Adam optimizer with model parameters, learning rate, and weight decay for regularization.
     optimizer = torch.optim.Adam(model.parameters(), lr=0.00004, weight_decay=0.001)
+    # Learning rate scheduler to reduce the learning rate when a metric has stopped improving. 
+    # Here, configured to monitor a metric for improvement, reducing LR by a factor of 0.5 after a patience of 5 epochs without improvement.
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True)
-    best_val_loss = float('inf')
-    best_val_psnr = 0
-    best_loss_model_state = None
-    best_psnr_model_state = None
-    train_losses = []
-    val_losses = []
-    train_psnrs = []
-    val_psnrs = []
+    best_val_loss = float('inf')  # Initialize the best validation loss to infinity for comparison.
+    best_val_psnr = 0  # Initialize the best validation PSNR to zero for comparison.
+    best_loss_model_state = None  # Placeholder for storing the model state with the best loss.
+    best_psnr_model_state = None  # Placeholder for storing the model state with the best PSNR.
+    train_losses = []  # List to store training losses per epoch.
+    val_losses = []  # List to store validation losses per epoch.
+    train_psnrs = []  # List to store training PSNR values per epoch.
+    val_psnrs = []  # List to store validation PSNR values per epoch.
 
-    epochs_since_best_val_psnr = 0
+    epochs_since_best_val_psnr = 0  # Counter to track epochs since last improvement in validation PSNR.
 
-    early_stopping_patience = 8
-    initial_accumulation_steps = 1
-    step_decrease_interval = 8
+    early_stopping_patience = 8  # Number of epochs to wait for an improvement before stopping the training.
+    initial_accumulation_steps = 1  # Initial number of gradient accumulation steps.
+    step_decrease_interval = 8  # Interval in epochs to decrease accumulation steps.
 
-    for epoch in range(epochs):
-        accumulation_steps = max(1, initial_accumulation_steps - (epoch // step_decrease_interval)) 
+    for epoch in range(epochs):  # Loop over the dataset multiple times, according to the number of epochs.
+        # Calculate the current number of accumulation steps, decreasing it over time based on the epoch.
+        accumulation_steps = max(1, initial_accumulation_steps - (epoch // step_decrease_interval))
 
-        # Train the model
-        model.train()
-        running_loss = 0.0
-        running_psnr = 0.0
-        for i, (before_imgs, after_imgs) in enumerate(train_loader):
-            before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)
-            optimizer.zero_grad()
-            outputs = model(before_imgs)
-            l1_loss = l1_criterion(outputs, after_imgs)
-            mse_loss = mse_criterion(outputs, after_imgs)
-            loss = l1_loss + mse_loss
-            loss /= accumulation_steps
-            loss.backward()
+        model.train()  # Set the model to training mode (enables dropout, batch normalization layers to behave accordingly).
+        running_loss = 0.0  # Variable to accumulate losses over the epoch.
+        running_psnr = 0.0  # Variable to accumulate PSNR values over the epoch.
+        for i, (before_imgs, after_imgs) in enumerate(train_loader):  # Iterate over the training dataset.
+            before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)  # Move data to the appropriate device (GPU or CPU).
+            optimizer.zero_grad()  # Clear the gradients of all optimized tensors.
+            outputs = model(before_imgs)  # Forward pass: compute predicted outputs by passing inputs to the model.
+            l1_loss = l1_criterion(outputs, after_imgs)  # Compute the L1 loss between predicted and target images.
+            mse_loss = mse_criterion(outputs, after_imgs)  # Compute the MSE loss between predicted and target images.
+            loss = l1_loss + mse_loss  # Combine L1 and MSE losses.
+            loss /= accumulation_steps  # Scale loss down by the number of accumulation steps (for consistent gradient magnitude).
+            loss.backward()  # Backward pass: compute gradient of the loss with respect to model parameters.
             if (i + 1) % accumulation_steps == 0: 
-                optimizer.step()  # update model parameters every accumulation_steps mini-batches
+                optimizer.step()  # Perform a single optimization step (parameter update).
 
-            # Update running_loss and running_psnr for every mini-batch
-            running_loss += loss.item() * accumulation_steps
-            psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())
-            running_psnr += psnr_val
+            running_loss += loss.item() * accumulation_steps  # Accumulate the scaled loss.
+            psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())  # Compute the PSNR between predicted and target images.
+            running_psnr += psnr_val  # Accumulate PSNR values.
 
         if (i + 1) % accumulation_steps != 0 or i == len(train_loader) - 1:
-            optimizer.step()  # update model parameters for remaining mini-batches
+            optimizer.step()  # Ensure optimizer step is performed if the last batch doesn't align with accumulation steps.
 
-        train_losses.append(running_loss / len(train_loader))
-        train_psnrs.append(running_psnr / len(train_loader))  # Add this line to store the average PSNR for the epoch
+        train_losses.append(running_loss / len(train_loader))  # Calculate and store the average training loss for the epoch.
+        train_psnrs.append(running_psnr / len(train_loader))  # Calculate and store the average training PSNR for the epoch.
 
         print("Epoch [{}/{}], Loss: {:.4f}, PSNR: {:.4f}".format(epoch + 1, epochs, running_loss / len(train_loader), running_psnr / len(train_loader)))
         
-        torch.cuda.empty_cache()
+        torch.cuda.empty_cache()  # Clear unused memory from GPU to avoid memory leaks.
 
-        # Evaluate the model on validation data
-        model.eval()
-        val_running_loss = 0.0
-        running_psnr = 0.0
+        model.eval()  # Set the model to evaluation mode (disables dropout and batch normalization layers).
+        val_running_loss = 0.0  # Variable to accumulate validation losses over the epoch.
+        running_psnr = 0.0  # Variable to accumulate PSNR values over the validation dataset.
 
-        with torch.no_grad():
-            for i, (before_imgs, after_imgs) in enumerate(val_loader):
-                before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)
+        with torch.no_grad():  # Disable gradient calculation to reduce memory consumption and speed up computations.
+            for i, (before_imgs, after_imgs) in enumerate(val_loader):  # Iterate over the validation dataset.
+                before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)  # Move data to the appropriate device.
 
-                outputs = model(before_imgs)
-                l1_loss = l1_criterion(outputs, after_imgs)
-                mse_loss = mse_criterion(outputs, after_imgs)
-                loss = l1_loss + mse_loss  # Combine L1 and L2 loss
-                val_running_loss += loss.item()
-                psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())
-                running_psnr += psnr_val
+                outputs = model(before_imgs)  # Forward pass: compute predicted outputs by passing inputs to the model.
+                l1_loss = l1_criterion(outputs, after_imgs)  # Compute the L1 loss between predicted and target images.
+                mse_loss = mse_criterion(outputs, after_imgs)  # Compute the MSE loss between predicted and target images.
+                loss = l1_loss + mse_loss  # Combine L1 and MSE losses for the overall loss.
+                val_running_loss += loss.item()  # Accumulate the validation loss.
+                psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())  # Compute the PSNR between predicted and target images.
+                running_psnr += psnr_val  # Accumulate PSNR values.
 
-        val_losses.append(val_running_loss / len(val_loader))
-        val_psnrs.append(running_psnr / len(val_loader))
-        print("Validation Loss: {:.4f}, PSNR: {:.4f}".format(val_running_loss / len(val_loader), running_psnr / len(val_loader)))
+        val_losses.append(val_running_loss / len(val_loader))  # Calculate and store the average validation loss for the epoch.
+        val_psnrs.append(running_psnr / len(val_loader))  # Calculate and store the average validation PSNR for the epoch.
+        print("Validation Loss: {:.4f}, PSNR: {:.4f}".format(val_running_loss / len(val_loader), running_psnr / len(val_loader)))  # Print the average validation loss and PSNR.
 
-        # Update the scheduler after each epoch
-        scheduler.step(running_psnr / len(val_loader))
+        scheduler.step(running_psnr / len(val_loader))  # Adjust the learning rate based on the validation PSNR.
 
-        # Update best validation PSNR and loss, reset patience counter
+        # Update the best validation loss and corresponding model state if the current validation loss is lower than the best recorded loss.
         if val_running_loss / len(val_loader) < best_val_loss:
             best_val_loss = val_running_loss / len(val_loader)
             best_loss_model_state = model.state_dict()
-            epochs_since_best_val_loss = 0  # Reset for best loss
+            epochs_since_best_val_loss = 0  # Reset the counter for epochs since last improvement in validation loss.
         else:
-            epochs_since_best_val_loss += 1  # Increment if no improvement in loss
+            epochs_since_best_val_loss += 1  # Increment the counter if no improvement in validation loss.
 
+        # Update the best validation PSNR and corresponding model state if the current validation PSNR is higher than the best recorded PSNR.
         if running_psnr / len(val_loader) > best_val_psnr:
             best_val_psnr = running_psnr / len(val_loader)
             best_psnr_model_state = model.state_dict()
-            epochs_since_best_val_psnr = 0  # Reset for best PSNR
+            epochs_since_best_val_psnr = 0  # Reset the counter for epochs since last improvement in validation PSNR.
         else:
-            epochs_since_best_val_psnr += 1  # Increment if no improvement in PSNR
+            epochs_since_best_val_psnr += 1  # Increment the counter if no improvement in validation PSNR.
 
+        # Check for early stopping conditions based on the lack of improvement in both validation loss and PSNR.
         if epochs_since_best_val_loss >= early_stopping_patience and epochs_since_best_val_psnr >= early_stopping_patience:
-            print("Early stopping triggered. Stopping training.")
-            break
+            print("Early stopping triggered. Stopping training.")  # Notify that training is being stopped early.
+            break  # Exit the training loop.
 
-    # Load the best model state for testing
-    model.load_state_dict(best_loss_model_state)
 
-    # Test the model
-    model.eval()
-    test_running_loss = 0.0
-    test_running_psnr = 0.0
-    with torch.no_grad():
-        for i, (before_imgs, after_imgs) in enumerate(test_loader):
-            before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)
-            outputs = model(before_imgs)
-            l1_loss = l1_criterion(outputs, after_imgs)
-            mse_loss = mse_criterion(outputs, after_imgs)
-            loss = l1_loss + mse_loss  # Combine L1 and L2 loss
-            test_running_loss += loss.item()
-            psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())
-            test_running_psnr += psnr_val
-            
+    model.load_state_dict(best_psnr_model_state)  # Load the model state with the best validation loss for testing.
+
+    model.eval()  # Set the model to evaluation mode for testing.
+    test_running_loss = 0.0  # Initialize variable to accumulate test losses.
+    test_running_psnr = 0.0  # Initialize variable to accumulate PSNR values on the test set.
+
+    with torch.no_grad():  # Disable gradient computation to save memory and computations during testing.
+        for i, (before_imgs, after_imgs) in enumerate(test_loader):  # Iterate over the test dataset.
+            before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)  # Move data to the device.
+            outputs = model(before_imgs)  # Forward pass: compute predictions for the test dataset.
+            l1_loss = l1_criterion(outputs, after_imgs)  # Compute L1 loss between predictions and true values.
+            mse_loss = mse_criterion(outputs, after_imgs)  # Compute MSE loss between predictions and true values.
+            loss = l1_loss + mse_loss  # Aggregate losses for a comprehensive error measure.
+            test_running_loss += loss.item()  # Accumulate the test loss.
+            psnr_val = psnr(outputs.detach().cpu(), after_imgs.cpu())  # Calculate PSNR between predictions and true values.
+            test_running_psnr += psnr_val  # Accumulate PSNR values for the test set.
+
+    # Calculate and print average loss and PSNR for the test dataset.
     print("Test Loss: {:.4f}, PSNR: {:.4f}".format(test_running_loss / len(test_loader), test_running_psnr / len(test_loader)))
 
-    # When saving models, use the model_save_path
-    torch.save(best_loss_model_state, (model_loss))
-    torch.save(best_psnr_model_state, (model_psnr))
+    # Save the model states that achieved the best validation loss and PSNR to disk.
+    torch.save(best_loss_model_state, 'best_loss_denocoder_pytorch.pth')  # Save model state with the best validation loss.
+    torch.save(best_psnr_model_state, 'best_psnr_denocoder_pytorch.pth')  # Save model state with the best validation PSNR.
 
-    plt.plot(train_losses, label="Training Loss")
-    plt.plot(val_losses, label="Validation Loss")
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.show()
+    # Plot the training and validation loss per epoch to visualize the learning process.
+    plt.plot(train_losses, label="Training Loss")  # Plot training loss over epochs.
+    plt.plot(val_losses, label="Validation Loss")  # Plot validation loss over epochs.
+    plt.xlabel("Epoch")  # Label the x-axis as 'Epoch'.
+    plt.ylabel("Loss")  # Label the y-axis as 'Loss'.
+    plt.legend()  # Show the legend to distinguish between training and validation loss.
+    plt.show()  # Display the plot.
 
 if __name__ == "__main__":
-    main()
+    main()  # Entry point of the script, invoking the main function if this script is executed.

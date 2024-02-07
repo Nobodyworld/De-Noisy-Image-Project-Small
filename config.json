@@ -1,5 +1,4 @@
 {
-  "project_root": ".",
   "directories": {
     "data": {
       "train": "./data/train",
@@ -8,12 +7,8 @@
       "play_data": "./data/play_data",
       "play_data_output": "./data/play_data/output",
       "stage_data": "./data/stage_data"
-    },
-    "models": {
-      "model_loss": "./models/best_loss_denocoder_pytorch.pth",
-      "model_psnr": "./models/best_psnr_denocoder_pytorch.pth"
+    }
     },
     "helpers": "./helpers",
     "utils": "./utils"
-  }
 }
