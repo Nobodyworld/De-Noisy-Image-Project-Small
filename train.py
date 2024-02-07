@@ -33,6 +33,7 @@ print(model_psnr)
 model_loss = (config['directories']['models']['model_loss'])
 print(model_loss)
 
+
 def main():
     # Set seed for reproducibility
     torch.manual_seed(42)
