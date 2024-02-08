@@ -6,7 +6,7 @@ from PIL import Image
 from models.unet import UNet
 
 try:
-    with open('config.json', 'r') as config_file:
+    with open('config/config.json', 'r') as config_file:
         config = json.load(config_file)
 except FileNotFoundError:
     print("Error: config.json file not found.")
@@ -17,12 +17,13 @@ except json.JSONDecodeError:
 
 play_data = os.path.join(config['directories']['data']['play_data'])
 play_data_output = os.path.join(config['directories']['data']['play_data_output'])
-model_path = os.path.join(config['directories']['models']['model_loss'])
+model_path = os.path.join(config['directories']['models'], 'best_psnr_model.pth')
+
 print("Loading model from:", model_path)
 
+img_height = config['training']['img_height']
+img_width = config['training']['img_width']
 
-img_height = 960
-img_width = 640
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = UNet()

@@ -6,8 +6,8 @@ def train_one_epoch(model, device, train_loader, optimizer, l1_criterion, mse_cr
     model.train()
     running_loss = 0.0
     running_psnr = 0.0
-    # Assuming 'accumulation_steps' is specified in your configuration
-    accumulation_steps = config['training']['accumulation_steps']
+    # Use get() method with a default value to avoid KeyError
+    accumulation_steps = config.get('accumulation_steps', 1)
     
     for i, (before_imgs, after_imgs) in enumerate(train_loader):
         before_imgs, after_imgs = before_imgs.to(device), after_imgs.to(device)
@@ -17,20 +17,19 @@ def train_one_epoch(model, device, train_loader, optimizer, l1_criterion, mse_cr
         mse_loss = mse_criterion(outputs, after_imgs)
         loss = l1_loss + mse_loss
 
-        # Instead of dividing the loss by accumulation_steps before loss.backward()
-        # Just keep track and step after accumulation_steps are reached
         loss.backward()
         if (i + 1) % accumulation_steps == 0 or i == len(train_loader) - 1:
             optimizer.step()
-            optimizer.zero_grad()  # Reset gradients after update
+            optimizer.zero_grad()
 
         running_loss += loss.item()
-        batch_psnr = psnr(outputs, after_imgs, max_pixel=1.0)  # Ensure max_pixel matches your data range
+        batch_psnr = psnr(outputs, after_imgs, max_pixel=1.0)
         running_psnr += batch_psnr
 
     avg_loss = running_loss / len(train_loader)
     avg_psnr = running_psnr / len(train_loader)
     return avg_loss, avg_psnr
+
 
 def validate(model, device, val_loader, l1_criterion, mse_criterion):
     model.eval()
@@ -46,7 +45,7 @@ def validate(model, device, val_loader, l1_criterion, mse_criterion):
             loss = l1_loss + mse_loss
 
             val_running_loss += loss.item()
-            val_running_psnr += psnr(outputs, after_imgs).item()
+            val_running_psnr += psnr(outputs, after_imgs)
 
     avg_loss = val_running_loss / len(val_loader)
     avg_psnr = val_running_psnr / len(val_loader)
