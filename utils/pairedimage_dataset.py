@@ -29,4 +29,3 @@ class PairedImageDataset(Dataset):
             after_image = self.after_transform(after_image)
 
         return before_image, after_image
-

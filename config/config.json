@@ -1,0 +1,56 @@
+{
+  "directories": {
+    "data": {
+      "train": "./data/train",
+      "test": "./data/test",
+      "val": "./data/val",
+      "play_data": "./data/play_data",
+      "play_data_output": "./data/play_data/output",
+      "stage_data": "./data/stage_data"
+    },
+    "models": "./models"
+  },
+  "model": {
+    "name": "unet",
+    "path": "./models/best_psnr_denocoder_pytorch.pth",
+    "input_shape": [960, 640, 3],  
+    "output_channels": 1 
+  },
+  "training": {
+    "epochs": 48,
+    "batch_size": 12,
+    "learning_rate": 0.00004,
+    "weight_decay": 0.001,
+    "early_stopping_patience": 8,
+    "step_decrease_interval": 8,
+    "img_height": 960,
+    "img_width": 640
+  },
+  "optimizer": {
+    "type": "adam",
+    "params": {
+      "lr": 0.00004,
+      "weight_decay": 0.001
+    }
+  },
+  "scheduler": {
+    "type": "ReduceLROnPlateau",
+    "params": {
+      "mode": "max",
+      "factor": 0.5,
+      "patience": 5,
+      "verbose": true
+    }
+  },
+  "augmentation": {
+    "color_jitter": {
+      "enabled": true,
+      "p": 0.25,
+      "brightness": 0.2,
+      "contrast": 0.2,
+      "saturation": 0.2,
+      "hue": 0.1
+    }
+  }
+  
+}

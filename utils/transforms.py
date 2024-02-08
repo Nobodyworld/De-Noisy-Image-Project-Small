@@ -1,26 +1,19 @@
 # /utils/transforms.py
-import random
 import torchvision
+from utils.transforms import RandomColorJitterWithRandomFactors
 
-class RandomColorJitterWithRandomFactors(torchvision.transforms.ColorJitter):
-    def __init__(self, brightness=0, contrast=0, saturation=0, hue=0, p=0.25):
-        super().__init__(brightness, contrast, saturation, hue)
-        self.p = p
+def get_transforms(config):
+    transforms_list = [torchvision.transforms.Resize((config['training']['img_height'], config['training']['img_width']))]
 
-    def __call__(self, img):
-        if random.random() < self.p:
-            brightness_factor = random.uniform(0.90, 1.10)
-            contrast_factor = random.uniform(0.90, 1.10)
-            saturation_factor = random.uniform(0.90, 1.10)
-            hue_factor = random.uniform(-0.1, 0.1)
+    if config['augmentation']['color_jitter']['enabled']:
+        jitter_params = config['augmentation']['color_jitter']
+        transforms_list.append(RandomColorJitterWithRandomFactors(
+            brightness=jitter_params['brightness'],
+            contrast=jitter_params['contrast'],
+            saturation=jitter_params['saturation'],
+            hue=jitter_params['hue'],
+            p=jitter_params['p']
+        ))
 
-            jitter = torchvision.transforms.ColorJitter(
-                brightness=brightness_factor,
-                contrast=contrast_factor,
-                saturation=saturation_factor,
-                hue=(hue_factor, hue_factor)
-            )
-            return jitter(img)
-        else:
-            return img
-        
+    transforms_list.append(torchvision.transforms.ToTensor())
+    return torchvision.transforms.Compose(transforms_list)
