@@ -14,7 +14,7 @@ def main():
     config = load_config('config/config.json')
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    train_loader, val_loader, test_loader = get_dataloaders(config['directories']['data'])
+    train_loader, val_loader, test_loader = get_dataloaders(config)
     model = UNet(input_channels=config['model']['input_shape'][-1], 
                  output_channels=config['model']['output_channels']).to(device)
     optimizer, scheduler = setup_optimizer_scheduler(model, config)

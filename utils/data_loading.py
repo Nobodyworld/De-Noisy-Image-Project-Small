@@ -18,12 +18,12 @@ def get_dataloaders(config):
     """Create DataLoader for training, validation, and testing datasets."""
     transform = get_transforms(config)
 
-    # Initialize datasets
-    train_dataset = PairedImageDataset(config['directories']['data']['train'], transform=transform)
-    val_dataset = PairedImageDataset(config['directories']['data']['val'], transform=transform)
-    test_dataset = PairedImageDataset(config['directories']['data']['test'], transform=transform)
+    # Assuming the same transform is applied to both 'before' and 'after' images
+    train_dataset = PairedImageDataset(config['directories']['data']['train'], before_transform=transform, after_transform=transform)
+    val_dataset = PairedImageDataset(config['directories']['data']['val'], before_transform=transform, after_transform=transform)
+    test_dataset = PairedImageDataset(config['directories']['data']['test'], before_transform=transform, after_transform=transform)
 
-    # Create DataLoaders
+    # Create DataLoaders using batch size from config
     train_loader = DataLoader(train_dataset, batch_size=config['training']['batch_size'], shuffle=True, pin_memory=True, num_workers=4)
     val_loader = DataLoader(val_dataset, batch_size=config['training']['batch_size'], shuffle=False, pin_memory=True, num_workers=4)
     test_loader = DataLoader(test_dataset, batch_size=config['training']['batch_size'], shuffle=False, pin_memory=True, num_workers=4)
