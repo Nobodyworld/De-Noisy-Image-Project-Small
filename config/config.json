@@ -12,9 +12,7 @@
   },
   "model": {
     "name": "unet",
-    "path": "./models/best_psnr_denocoder_pytorch.pth",
-    "input_shape": [960, 640, 3],  
-    "output_channels": 1 
+    "path": "./models/best_psnr_model.pth"
   },
   "training": {
     "epochs": 48,
