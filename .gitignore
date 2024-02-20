@@ -1,4 +1,3 @@
-__pycache__
 __pycache__/
 *.py[cod]
 *.pyo
@@ -9,3 +8,6 @@ venv/
 .idea/
 .vscode/
 *.swp
+.conda/
+.conda
+node_modules/

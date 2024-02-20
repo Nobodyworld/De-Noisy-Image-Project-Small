@@ -3,7 +3,7 @@ import os
 import torch
 import torchvision.transforms as transforms
 from PIL import Image
-from models.unet import UNet
+from model_parts.unet import UNet
 
 try:
     with open('config/config.json', 'r') as config_file:
@@ -17,7 +17,7 @@ except json.JSONDecodeError:
 
 play_data = os.path.join(config['directories']['data']['play_data'])
 play_data_output = os.path.join(config['directories']['data']['play_data_output'])
-model_path = os.path.join(config['directories']['models'], 'best_psnr_model.pth')
+model_path = os.path.join(config['model']['path'] + config['model']['file_name'])
 
 print("Loading model from:", model_path)
 

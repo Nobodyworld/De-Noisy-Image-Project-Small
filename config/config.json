@@ -8,38 +8,45 @@
       "play_data_output": "./data/play_data/output",
       "stage_data": "./data/stage_data"
     },
-    "models": "./models"
+    "models": "./models",
+    "config": "./config",
+    "tests": "./tests",
+    "utils": "./utils"
   },
   "model": {
     "name": "unet",
-    "path": "./models/best_psnr_model.pth"
+    "architecture": "unet.py",
+    "path": "./models/other_model/",
+    "file_name": "other_model.pth"
   },
   "training": {
-    "epochs": 48,
-    "batch_size": 12,
+    "epochs": 36,
+    "batch_size": 2,
     "accumulation_steps": 1,
-    "learning_rate": 0.00001,
-    "weight_decay": 0.001,
+    "num_workers": 4,
+    "pin_memory": true,
+    "shuffle": true,
+    "early_stopping": true,
     "early_stopping_patience": 8,
     "step_decrease_interval": 8,
-    "img_height": 960,
-    "img_width": 640
+    "img_height": 1152,
+    "img_width": 768
   },
   "optimizer": {
     "type": "adam",
     "params": {
-      "lr": 0.00004,
+      "lr": 0.00001,
       "weight_decay": 0.001
     }
   },
   "scheduler": {
     "type": "ReduceLROnPlateau",
-    "params": {
-      "mode": "max",
-      "factor": 0.5,
-      "patience": 5,
-      "verbose": true
-    }
+      "params": {
+        "mode": "max",
+        "factor": 0.5,
+        "patience": 5,
+        "verbose": true
+        }   
   },
   "augmentation": {
     "color_jitter": {
@@ -50,6 +57,21 @@
       "saturation": 0.2,
       "hue": 0.1
     }
+  },
+  "metrics": {
+    "psnr": {
+      "enabled": true,
+      "max_pixel": 1.0,
+      "eps": 1e-10,
+      "reduction": "mean"
+    },
+    "ssim": {
+      "enabled": false
+    
+    }
   }
-  
 }
+  
+
+
+  
