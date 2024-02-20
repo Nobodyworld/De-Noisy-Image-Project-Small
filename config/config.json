@@ -20,7 +20,7 @@
     "file_name": "other_model.pth"
   },
   "training": {
-    "epochs": 36,
+    "epochs": 32,
     "batch_size": 2,
     "accumulation_steps": 1,
     "num_workers": 4,
